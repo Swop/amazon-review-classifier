@@ -12,14 +12,36 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Methodes permettant les etapes d'apprentissage
+ */
 public class Learning {
+	/**
+	 * Reggex de debut de reveiw
+	 */
 	public final static Pattern reviewStartMarkupPattern = Pattern.compile("<review id='([0-9]+)' class='(.+)'>");
+	/**
+	 * Regex de fin de review
+	 */
 	public final static Pattern reviewEndMarkupPattern = Pattern.compile("^\\s*</review>\\s*$");
 
+	/**
+	 * Labels possibles pour une review
+	 */
 	public enum Label { POSITIVE, NEGATIVE, UNKNOWN };
 
+	/**
+	 * Approches possibles pour l'apprentissage semi-suppervise
+	 */
 	public enum SemiSupervisedLearningAppoach { REAL_LABELS, FUZZY_LABELS };
 
+	/**
+	 * Effecture l'apprentissage supervise par rapport a un fichier de reviews
+	 * @param file Le fichier de reviews
+	 * @param model Le model addpte (binomial, multinomial)
+	 * @param corpus Le corpus ou stoquer le dictionnaire
+	 * @param pattern La regex a utiliser pour l'accteptation des mots
+	 */
 	public static void supervisedLearning(File file, ModelType model, CorpusInfos corpus, Pattern pattern) {
 		List<ReviewInfos> reviews = getReviewsFromFile(file, model, SemiSupervisedLearningAppoach.REAL_LABELS, corpus, pattern, false);
 
@@ -29,14 +51,17 @@ public class Learning {
 
 			wdInfos.computeBetaPositive(model, corpus);
 			wdInfos.computeBetaNegative(model, corpus);
-
-//			System.out.println("	Mot : " + word);
-//			System.out.println("	Beta[POS] : " + wdInfos.getBetaPositive());
-//			System.out.println("	Beta[NEG] : " + wdInfos.getBetaNegative());
-//			System.out.println("");
 		}
 	}
 
+	/**
+	 * Effecture l'apprentissage supervise par rapport a un fichier de reviews
+	 * @param file Le fichier de reviews
+	 * @param model Le model addpte (binomial, multinomial)
+	 * @param approach Approche pour l'apprentissage semi-suppervise (logique floue ou label reels)
+	 * @param corpus Le corpus ou stoquer le dictionnaire
+	 * @param pattern La regex a utiliser pour l'accteptation des mots
+	 */
 	public static void semiSupervisedLearning(File file, ModelType model, SemiSupervisedLearningAppoach approach, CorpusInfos corpus, Pattern pattern) {
 		List<ReviewInfos> reviews = getReviewsFromFile(file, model, approach, corpus, pattern, true);
 
@@ -44,16 +69,21 @@ public class Learning {
 			String word = (String) w;
 			WordInfos wdInfos = (WordInfos) corpus.getDictionary().get(word);
 
-			//System.out.println("	Mot : " + word);
 			wdInfos.computeBetaPositive(model, corpus);
-			//System.out.println("	Beta[POS] : " + wdInfos.getBetaPositive());
 			wdInfos.computeBetaNegative(model, corpus);
-			//System.out.println("	Beta[NEG] : " + wdInfos.getBetaNegative());
-
-			//System.out.println("");
 		}
 	}
 
+	/**
+	 * Recupere les infos des reviews a partir du fichier
+	 * @param file Le fichier a annalyser
+	 * @param model Le model addpte (binomial, multinomial)
+	 * @param approach Approche pour l'apprentissage semi-suppervise (logique floue ou label reels)
+	 * @param corpus Le corpus ou stoquer le dictionnaire
+	 * @param pattern La regex a utiliser pour l'accteptation des mots
+	 * @param semiSupp TRUE si l'apprentissage est semi-suppervise
+	 * @return La liste des reviews
+	 */
 	public static List<ReviewInfos> getReviewsFromFile(File file, ModelType model, SemiSupervisedLearningAppoach approach, CorpusInfos corpus, Pattern pattern, boolean semiSupp) {
 		List<ReviewInfos> reviews = new ArrayList<ReviewInfos>();
 		HashMap reviewDictionary = null;
@@ -155,7 +185,7 @@ public class Learning {
 						String word = st.nextToken();//.toLowerCase();
 						if (acceptWord(word, pattern)) {
 							switch(model) {
-								case BERNOULLI:
+								case BINOMIAL:
 									reviewDictionary.put(word, 1);
 									break;
 								case MULTINOMIAL:
@@ -180,8 +210,13 @@ public class Learning {
 		return reviews;
 	}
 
+	/**
+	 * Teste si un mot est accepteee ou non
+	 * @param word Le mot
+	 * @param pattern La regex
+	 * @return Le resultat du test
+	 */
 	public static boolean acceptWord(String word, Pattern pattern) {
-		//Pattern pattern = Pattern.compile("[a-zA-Z]{1,}");
 		Matcher matcher = pattern.matcher(word);
 		return matcher.matches();
 	}

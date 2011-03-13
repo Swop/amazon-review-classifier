@@ -9,14 +9,33 @@ import java.io.IOException;
 import java.util.regex.Pattern;
 import org.jfree.data.xy.XYSeries;
 
+/**
+ * Classe principale du programme.
+ */
 public class Main {
 
+	/**
+	 * Nom de l'application
+	 */
 	public static final String APP_NAME = "Amazon Review Categorizer";
+	/**
+	 * Numero de version de l'application
+	 */
 	public static final String APP_VERSION = "1.0";
+	/**
+	 * Auteurs de l'application
+	 */
 	public static final String APP_AUTHORS = "Sylvain MAUDUIT & Olivier LE STER";
 
+	/**
+	 * Reference vers le dossier du corpus
+	 */
 	private static File mainFolder = null;
 
+	/**
+	 * Methode d'entree du programme
+	 * @param args Arguments de la console
+	 */
 	public static void main(String[] args) {
 		if(args.length < 2) {
 			printUsage();
@@ -39,12 +58,17 @@ public class Main {
 		printHeader();
 		mainFolder = new File(args[1]);
 
+		// Lance la batterie de simulations
 		makeSimulations();
+		// Effectue les tests des differents dommaines
 		makeTests();
 	}
 
+	/**
+	 * Teste le domaine "books" (apprentissage suppervise))
+	 * @param pattern Regex utilisee pour l'acceptation des mots
+	 */
 	private static void testBooks(Pattern pattern) {
-//		Pattern pattern = Pattern.compile("[a-zA-Z]{2,}");
 		CorpusInfos corpus = new CorpusInfos();
 		System.out.println("==== BOOKS ====");
 		
@@ -58,8 +82,11 @@ public class Main {
 		System.out.println("Success : "+pourcOK+" %");
 	}
 
+	/**
+	 * Teste le domaine "electronics" (apprentissage suppervise)
+	 * @param pattern Regex utilisee pour l'acceptation des mots
+	 */
 	private static void testElectronics(Pattern pattern) {
-//		Pattern pattern = Pattern.compile("[a-zA-Z]{2,}");
 		CorpusInfos corpus = new CorpusInfos();
 		System.out.println("==== ELECTRONICS ====");
 
@@ -73,8 +100,11 @@ public class Main {
 		System.out.println("Success : "+pourcOK+" %");
 	}
 
+	/**
+	 * Teste le domaine "kitchen" (Apprentissage suppervise uniquement)
+	 * @param pattern Regex utilisee pour l'acceptation des mots
+	 */
 	private static void testSupervisedLearningKitchen(Pattern pattern) {
-//		Pattern pattern = Pattern.compile("[a-zA-Z]{2,}");
 		CorpusInfos corpus = new CorpusInfos();
 		System.out.println("==== KITCHEN ====");
 
@@ -88,6 +118,10 @@ public class Main {
 		System.out.println("Success : "+pourcOK+" %");
 	}
 
+	/**
+	 * Teste le domaine "kitchen" (Apprentissage suppervise + semi-suppervise avec utilisation d'etiquettes "pleines")
+	 * @param pattern Regex utilisee pour l'acceptation des mots
+	 */
 	private static void testSemiSupervisedLearningKitchenWithTrueLabels(Pattern pattern) {
 //		Pattern pattern = Pattern.compile("[a-zA-Z]{2,}");
 		CorpusInfos corpus = new CorpusInfos();
@@ -108,8 +142,11 @@ public class Main {
 		System.out.println("Success : "+pourcOK+" %");
 	}
 
+	/**
+	 * Teste le domaine "kitchen" (Apprentissage suppervise + semi-suppervise avec utilisation d'etiquettes "floues")
+	 * @param pattern Regex utilisee pour l'acceptation des mots
+	 */
 	private static void testSemiSupervisedLearningKitchenWithFuzzyLabels(Pattern pattern) {
-//		Pattern pattern = Pattern.compile("[a-zA-Z]{2,}");
 		CorpusInfos corpus = new CorpusInfos();
 		System.out.println("==== KITCHEN ====");
 
@@ -128,8 +165,11 @@ public class Main {
 		System.out.println("Success : "+pourcOK+" %");
 	}
 
+	/**
+	 * Teste le domaine "dvds" (Apprentissage suppervise utilisant les donnees dans 3 autres domaines)
+	 * @param pattern Regex utilisee pour l'acceptation des mots
+	 */
 	private static void testSupervisedGlobalLearningDvds(Pattern pattern) {
-//		Pattern pattern = Pattern.compile("[a-zA-Z]{2,}");
 		CorpusInfos corpus = new CorpusInfos();
 		System.out.println("==== DVD ====");
 
@@ -153,8 +193,11 @@ public class Main {
 		System.out.println("Success : "+pourcOK+" %");
 	}
 
+	/**
+	 * Teste le domaine "dvds" (Apprentissage suppervise utilisant les donnees dans 3 autres domaines + semi-suppervise avec etiquettes "pleines")
+	 * @param pattern Regex utilisee pour l'acceptation des mots
+	 */
 	private static void testSemiSupervisedGlobalLearningDvdsWithTrueLabels(Pattern pattern) {
-//		Pattern pattern = Pattern.compile("[a-zA-Z]{2,}");
 		CorpusInfos corpus = new CorpusInfos();
 		System.out.println("==== DVD ====");
 
@@ -183,8 +226,11 @@ public class Main {
 		System.out.println("Success : "+pourcOK+" %");
 	}
 
+	/**
+	 * Teste le domaine "dvds" (Apprentissage suppervise utilisant les donnees dans 3 autres domaines + semi-suppervise avec etiquettes "floues")
+	 * @param pattern Regex utilisee pour l'acceptation des mots
+	 */
 	private static void testSemiSupervisedGlobalLearningDvdsWithFuzzyLabels(Pattern pattern) {
-//		Pattern pattern = Pattern.compile("[a-zA-Z]{2,}");
 		CorpusInfos corpus = new CorpusInfos();
 		System.out.println("==== DVD ====");
 
@@ -212,7 +258,10 @@ public class Main {
 		double pourcOK = Inference.test(new File(mainFolder.getAbsolutePath()+"/dvd/dev.txt"), corpus.getDictionary(), ModelType.MULTINOMIAL, false);
 		System.out.println("Success : "+pourcOK+" %");
 	}
-	
+
+	/**
+	 * Effectue la simulation pour le domaine "books". Teste different classificateurs et dessine un graph des differentes performances
+	 */
 	private static void simulationBooks() {
 		Chart chart = null;
 		String pathChart = "simulBooks.jpg";
@@ -242,12 +291,15 @@ public class Main {
 
 		chart.buildChart();
 		try {
-			chart.saveChart(pathChart, 1000, 800, 100);
+			chart.saveChart(pathChart, 700, 400, 100);
 			System.out.println("Chart saved in "+pathChart);
 		} catch (FileNotFoundException ex) {
 		} catch (IOException ex) {}
 	}
 
+	/**
+	 * Effectue la simulation pour le domaine "electronics". Teste different classificateurs et dessine un graph des differentes performances
+	 */
 	private static void simulationElectronics() {
 		Chart chart = null;
 		String pathChart = "simulElectronics.jpg";
@@ -277,12 +329,15 @@ public class Main {
 
 		chart.buildChart();
 		try {
-			chart.saveChart(pathChart, 1000, 800, 100);
+			chart.saveChart(pathChart, 700, 400, 100);
 			System.out.println("Chart saved in "+pathChart);
 		} catch (FileNotFoundException ex) {
 		} catch (IOException ex) {}
 	}
 
+	/**
+	 * Effectue l'ensemble des simulaions
+	 */
 	private static void makeSimulations() {
 		System.out.println("********** SIMULATIONS ***********");
 		System.out.println("");
@@ -295,6 +350,9 @@ public class Main {
 		System.out.println("");
 	}
 
+	/**
+	 * Effectue l'ensemble des tests
+	 */
 	private static void makeTests() {
 		System.out.println("********** TESTS ***********");
 		System.out.println("");
@@ -320,6 +378,9 @@ public class Main {
 		Main.testSemiSupervisedGlobalLearningDvdsWithFuzzyLabels(pattern);
 	}
 
+	/**
+	 * Imprime a l'ecran l'utilisation du logiciel
+	 */
 	private static void printUsage() {
 		System.out.println("Usage:");
 		System.out.println("Appname simulation path_to_mdsa_directory");
@@ -327,6 +388,9 @@ public class Main {
 		System.out.println("Appname test file_to_test path_to_mdsa_directory");
 	}
 
+	/**
+	 * Imprime a l'ecran les informations du programme (nom, vesrion, auteurs)
+	 */
 	private static void printHeader() {
 		System.out.println("**************************************");
 		System.out.println();
@@ -337,6 +401,10 @@ public class Main {
 		System.out.println();
 	}
 
+	/**
+	 * Effectue un test a l'aveugle, en se basant sur un apprentissage suppervise des trois domaines disposants d'etiquettes
+	 * @param file Le fichier a tester
+	 */
 	private static void blindTest(File file) {
 		Pattern pattern = Pattern.compile("[a-zA-Z]{2,}");
 
@@ -346,9 +414,8 @@ public class Main {
 		Learning.supervisedLearning(new File(mainFolder.getAbsolutePath()+"/electronics/training.txt"), ModelType.MULTINOMIAL, corpus, pattern);
 		Learning.supervisedLearning(new File(mainFolder.getAbsolutePath()+"/kitchen/training.txt"), ModelType.MULTINOMIAL, corpus, pattern);
 
-		Learning.semiSupervisedLearning(new File(mainFolder.getAbsolutePath()+"/dvd/unlab.txt"), ModelType.MULTINOMIAL, Learning.SemiSupervisedLearningAppoach.FUZZY_LABELS, corpus, pattern);
+		//Learning.semiSupervisedLearning(new File(mainFolder.getAbsolutePath()+"/dvd/unlab.txt"), ModelType.MULTINOMIAL, Learning.SemiSupervisedLearningAppoach.FUZZY_LABELS, corpus, pattern);
 
-		double pourcOK = Inference.test(file, corpus.getDictionary(), ModelType.MULTINOMIAL, true);
-		System.out.println("Success : "+pourcOK+" %");
+		Inference.test(file, corpus.getDictionary(), ModelType.MULTINOMIAL, true);
 	}
 }

@@ -10,8 +10,18 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 
+/**
+ * Ensemble de classe permettant de statuer sur un ensemble de reviews
+ */
 public class Inference {
 
+	/**
+	 * Test une review
+	 * @param reviewText Le texte de la review
+	 * @param dictionary Le dictionnaire du corpus
+	 * @param model Le type de modele utilise dans la construction du dictionnaire (Binomial ou multinomial)
+	 * @return Les valeur (entre 0 et 1) de probabilite d'appartenance de la review a chaque classe (0 : positive, 1 : negative)
+	 */
 	public static double[] testReviewFuzzy(String reviewText, HashMap dictionary, ModelType model) {
 		double[] fuzzyValues = new double[2];
 
@@ -24,7 +34,7 @@ public class Inference {
 		StringTokenizer st = new StringTokenizer(reviewText);
 
 		switch(model) {
-			case BERNOULLI:
+			case BINOMIAL:
 				HashMap revDictionary = new HashMap();
 
 				while (st.hasMoreTokens()) {
@@ -67,6 +77,13 @@ public class Inference {
 		return fuzzyValues;
 	}
 
+	/**
+	 * Test une review
+	 * @param reviewText Le texte de la review
+	 * @param dictionary Le dictionnaire du corpus
+	 * @param model Le type de modele utilise dans la construction du dictionnaire (Binomial ou multinomial)
+	 * @return L'etiquette de la review
+	 */
 	public static Learning.Label testReview(String reviewText, HashMap dictionary, ModelType model) {
 		double[] fuzzyValues = testReviewFuzzy(reviewText, dictionary, model);
 
@@ -79,6 +96,14 @@ public class Inference {
 				return Label.POSITIVE;
 	}
 
+	/**
+	 * Teste un fichier (ensemble de review)
+	 * @param file Le fichier a tester
+	 * @param dictionnary Le dictionnaire du corpus
+	 * @param model Le type de modele utilise dans la construction du dictionnaire (Binomial ou multinomial)
+	 * @param printReview Si le programme est en mode "test" (true) ou en mode simulation (false)
+	 * @return La performance
+	 */
 	public static double test(File file, HashMap dictionnary, ModelType model, boolean printReview) {
 		int cptOK = 0;
 		int cptKO = 0;
